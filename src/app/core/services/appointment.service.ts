@@ -11,8 +11,6 @@ export class AppointmentService {
   public editingAppointment$ = this.editingAppointment.asObservable();
 
   constructor(private http: HttpClient) {}
-
-  //chart
   getProducts(): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(this.apiUrl);
   }

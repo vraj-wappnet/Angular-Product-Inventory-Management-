@@ -299,6 +299,7 @@ export class BookAppointmentComponent implements OnInit {
         : 'bg-white text-gray-900 border-gray-300 focus:border-blue-500 focus:ring-blue-500';
   }
 
+  // Update the onSubmit() method:
   onSubmit() {
     if (this.appointmentForm.valid && this.currentUser) {
       this.isLoading = true;
@@ -317,23 +318,28 @@ export class BookAppointmentComponent implements OnInit {
           next: () => {
             this.handleSuccess('Product updated successfully!');
             this.appointmentService.clearEditingAppointment();
+            this.router.navigate(['/admin']); // Add this line
           },
           error: (err) => this.handleError(err, 'Failed to update product.'),
         });
       } else {
         this.appointmentService.bookAppointment(appointmentData).subscribe({
-          next: () => this.handleSuccess('Product added successfully!'),
+          next: () => {
+            this.handleSuccess('Product added successfully!');
+            this.router.navigate(['/appointments']); // Add this line
+          },
           error: (err) => this.handleError(err, 'Failed to add product.'),
         });
       }
     }
   }
 
+  // Update the handleSuccess method to remove the navigation:
+
   private handleSuccess(message: string): void {
     this.notificationService.showNotification(message, 'success');
     this.appointmentForm.reset();
     this.isLoading = false;
-    this.router.navigate(['/admin']);
   }
 
   private handleError(error: any, message: string): void {

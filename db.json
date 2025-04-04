@@ -32,6 +32,50 @@
       "status": "Booked",
       "id": "gswo3kr",
       "createdAt": "2025-04-04T07:24:27.644Z"
+    },
+    {
+      "id": "9dmpr15",
+      "productName": "cgs",
+      "category": "Clothing",
+      "price": 2,
+      "stockQuantity": 12,
+      "description": "sda",
+      "userName": "user1",
+      "status": "Booked",
+      "createdAt": "2025-04-04T11:55:44.967Z"
+    },
+    {
+      "id": "scdjo3w",
+      "productName": "GPU",
+      "category": "Electronics",
+      "price": 23499,
+      "stockQuantity": 22,
+      "description": "asdfgtrewqzxcv",
+      "userName": "user1",
+      "status": "Booked",
+      "createdAt": "2025-04-04T12:01:34.981Z"
+    },
+    {
+      "id": "7o4b38w",
+      "productName": "cgs",
+      "category": "Clothing",
+      "price": 21,
+      "stockQuantity": 123,
+      "description": "21sw",
+      "userName": "user1",
+      "status": "Booked",
+      "createdAt": "2025-04-04T12:02:13.526Z"
+    },
+    {
+      "productName": "ss",
+      "category": "Electronics",
+      "price": 2,
+      "stockQuantity": 1,
+      "description": "1",
+      "userName": "admin",
+      "status": "Booked",
+      "id": "shg19sy",
+      "createdAt": "2025-04-04T12:03:42.794Z"
     }
   ],
   "services": [
