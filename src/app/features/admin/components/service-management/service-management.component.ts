@@ -4,17 +4,9 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { ThemeService } from '../../../../core/services/theme.service';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { AppointmentService } from '../../../../core/services/appointment.service';
+import { Appointment } from '../../../appointments/models/appointment.model';
 
 Chart.register(...registerables);
-
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  stockQuantity: number;
-  price: number;
-  description?: string;
-}
 
 interface CategoryCount {
   category: string;
@@ -26,16 +18,206 @@ interface CategoryCount {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <!-- Template remains the same as your previous version -->
-    <!-- ... -->
+    <div class="container mx-auto p-4" [ngClass]="themeClass">
+      <h2
+        class="text-2xl font-bold mb-6"
+        [ngClass]="{ 'text-white': theme === 'dark' }"
+      >
+        Product Analytics Dashboard
+      </h2>
+
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Total Products Card -->
+        <div class="p-6 rounded-lg shadow-md" [ngClass]="cardThemeClass">
+          <h3
+            class="text-lg font-semibold mb-2"
+            [ngClass]="{ 'text-gray-300': theme === 'dark' }"
+          >
+            Total Products
+          </h3>
+          <p
+            class="text-3xl font-bold"
+            [ngClass]="{ 'text-white': theme === 'dark' }"
+          >
+            {{ totalProducts }}
+          </p>
+        </div>
+
+        <!-- Low Stock Alerts Card -->
+        <div class="p-6 rounded-lg shadow-md" [ngClass]="cardThemeClass">
+          <h3
+            class="text-lg font-semibold mb-2"
+            [ngClass]="{ 'text-gray-300': theme === 'dark' }"
+          >
+            Low Stock Alerts
+          </h3>
+          <p class="text-3xl font-bold text-red-500">
+            {{ lowStockCount }}
+          </p>
+          <p
+            class="text-sm mt-1"
+            [ngClass]="{ 'text-gray-400': theme === 'dark' }"
+          >
+            Products below 10 in stock
+          </p>
+        </div>
+
+        <!-- Top Category Card -->
+        <div class="p-6 rounded-lg shadow-md" [ngClass]="cardThemeClass">
+          <h3
+            class="text-lg font-semibold mb-2"
+            [ngClass]="{ 'text-gray-300': theme === 'dark' }"
+          >
+            Top Category
+          </h3>
+          <p
+            class="text-xl font-bold"
+            [ngClass]="{ 'text-white': theme === 'dark' }"
+          >
+            {{ topCategory?.category || 'N/A' }}
+          </p>
+          <p
+            class="text-sm mt-1"
+            [ngClass]="{ 'text-gray-400': theme === 'dark' }"
+          >
+            {{ topCategory?.count || 0 }} products
+          </p>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Stock Distribution Chart -->
+        <div class="p-6 rounded-lg shadow-md" [ngClass]="cardThemeClass">
+          <h3
+            class="text-lg font-semibold mb-4"
+            [ngClass]="{ 'text-gray-300': theme === 'dark' }"
+          >
+            Stock Distribution
+          </h3>
+          <div class="h-64">
+            <canvas id="stockChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Category Distribution Chart -->
+        <div class="p-6 rounded-lg shadow-md" [ngClass]="cardThemeClass">
+          <h3
+            class="text-lg font-semibold mb-4"
+            [ngClass]="{ 'text-gray-300': theme === 'dark' }"
+          >
+            Category Distribution
+          </h3>
+          <div class="h-64">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Low Stock Products Table -->
+      <div class="p-6 rounded-lg shadow-md mb-8" [ngClass]="cardThemeClass">
+        <h3
+          class="text-lg font-semibold mb-4"
+          [ngClass]="{ 'text-gray-300': theme === 'dark' }"
+        >
+          Low Stock Products
+        </h3>
+        <div class="overflow-x-auto">
+          <table
+            class="min-w-full"
+            [ngClass]="{ 'divide-gray-700': theme === 'dark' }"
+          >
+            <thead
+              [ngClass]="{
+                'bg-gray-700': theme === 'dark',
+                'bg-gray-200': theme === 'light'
+              }"
+            >
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  [ngClass]="{
+                    'text-gray-300': theme === 'dark',
+                    'text-gray-700': theme === 'light'
+                  }"
+                >
+                  Product
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  [ngClass]="{
+                    'text-gray-300': theme === 'dark',
+                    'text-gray-700': theme === 'light'
+                  }"
+                >
+                  Category
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                  [ngClass]="{
+                    'text-gray-300': theme === 'dark',
+                    'text-gray-700': theme === 'light'
+                  }"
+                >
+                  Current Stock
+                </th>
+              </tr>
+            </thead>
+            <tbody
+              class="divide-y"
+              [ngClass]="{
+                'divide-gray-700': theme === 'dark',
+                'divide-gray-200': theme === 'light'
+              }"
+            >
+              <tr
+                *ngFor="let product of lowStockProducts"
+                [ngClass]="{
+                  'hover:bg-gray-700': theme === 'dark',
+                  'hover:bg-gray-50': theme === 'light'
+                }"
+              >
+                <td
+                  class="px-6 py-4 whitespace-nowrap"
+                  [ngClass]="{ 'text-white': theme === 'dark' }"
+                >
+                  {{ product.productName }}
+                </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap"
+                  [ngClass]="{ 'text-white': theme === 'dark' }"
+                >
+                  {{ product.category }}
+                </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-red-500 font-semibold"
+                >
+                  {{ product.stockQuantity }}
+                </td>
+              </tr>
+              <tr *ngIf="lowStockProducts.length === 0">
+                <td
+                  colspan="3"
+                  class="px-6 py-4 text-center"
+                  [ngClass]="{ 'text-gray-400': theme === 'dark' }"
+                >
+                  No low stock products
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   `,
   styles: [],
 })
-export class ProductDashboardComponent implements OnInit {
-  products: Product[] = [];
+export class ServiceManagementComponent implements OnInit {
+  products: Appointment[] = [];
   totalProducts: number = 0;
   lowStockCount: number = 0;
-  lowStockProducts: Product[] = [];
+  lowStockProducts: Appointment[] = [];
   topCategory: CategoryCount | null = null;
   theme: string = 'light';
   themeClass: string = '';
@@ -67,7 +249,7 @@ export class ProductDashboardComponent implements OnInit {
 
   loadProducts() {
     this.productService.getProducts().subscribe({
-      next: (products: Product[]) => {
+      next: (products: Appointment[]) => {
         this.products = products;
         this.analyzeProducts();
         this.createCharts();
@@ -218,7 +400,9 @@ export class ProductDashboardComponent implements OnInit {
     return baseColors.slice(0, count);
   }
 
-  getBarChartOptions(title: string) {
+  private getBarChartOptions(
+    title: string
+  ): ChartConfiguration<'bar'>['options'] {
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -239,8 +423,7 @@ export class ProductDashboardComponent implements OnInit {
         },
       },
       scales: {
-        y: {
-          beginAtZero: true,
+        x: {
           ticks: {
             color: this.theme === 'dark' ? '#9CA3AF' : '#6B7280',
           },
@@ -248,7 +431,8 @@ export class ProductDashboardComponent implements OnInit {
             color: this.theme === 'dark' ? '#374151' : '#E5E7EB',
           },
         },
-        x: {
+        y: {
+          beginAtZero: true,
           ticks: {
             color: this.theme === 'dark' ? '#9CA3AF' : '#6B7280',
           },
@@ -260,7 +444,9 @@ export class ProductDashboardComponent implements OnInit {
     };
   }
 
-  getDoughnutChartOptions(title: string) {
+  private getDoughnutChartOptions(
+    title: string
+  ): ChartConfiguration<'doughnut'>['options'] {
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -287,24 +473,26 @@ export class ProductDashboardComponent implements OnInit {
     if (this.stockChart) {
       const options = this.stockChart.options;
       if (options.plugins?.title) {
-        options.plugins.title.color =
+        (options.plugins.title as any).color =
           this.theme === 'dark' ? '#E5E7EB' : '#111827';
       }
-      if (options.scales?.x) {
-        options.scales.x.ticks = {
-          color: this.theme === 'dark' ? '#9CA3AF' : '#6B7280',
-        };
-        options.scales.x.grid = {
-          color: this.theme === 'dark' ? '#374151' : '#E5E7EB',
-        };
-      }
-      if (options.scales?.y) {
-        options.scales.y.ticks = {
-          color: this.theme === 'dark' ? '#9CA3AF' : '#6B7280',
-        };
-        options.scales.y.grid = {
-          color: this.theme === 'dark' ? '#374151' : '#E5E7EB',
-        };
+      if (options.scales) {
+        if (options.scales['x']) {
+          (options.scales['x'] as any).ticks = {
+            color: this.theme === 'dark' ? '#9CA3AF' : '#6B7280',
+          };
+          (options.scales['x'] as any).grid = {
+            color: this.theme === 'dark' ? '#374151' : '#E5E7EB',
+          };
+        }
+        if (options.scales['y']) {
+          (options.scales['y'] as any).ticks = {
+            color: this.theme === 'dark' ? '#9CA3AF' : '#6B7280',
+          };
+          (options.scales['y'] as any).grid = {
+            color: this.theme === 'dark' ? '#374151' : '#E5E7EB',
+          };
+        }
       }
       this.stockChart.update();
     }
@@ -312,11 +500,11 @@ export class ProductDashboardComponent implements OnInit {
     if (this.categoryChart) {
       const options = this.categoryChart.options;
       if (options.plugins?.title) {
-        options.plugins.title.color =
+        (options.plugins.title as any).color =
           this.theme === 'dark' ? '#E5E7EB' : '#111827';
       }
       if (options.plugins?.legend?.labels) {
-        options.plugins.legend.labels.color =
+        (options.plugins.legend.labels as any).color =
           this.theme === 'dark' ? '#E5E7EB' : '#111827';
       }
       this.categoryChart.update();
