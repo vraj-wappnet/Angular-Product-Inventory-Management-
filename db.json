@@ -1,0 +1,46 @@
+{
+  "appointments": [
+    {
+      "productName": "utensils",
+      "category": "Furniture",
+      "price": 12,
+      "stockQuantity": 122,
+      "description": "sdddq1s",
+      "userName": "admin",
+      "status": "Booked",
+      "id": "633xx5a",
+      "createdAt": "2025-04-04T06:33:42.096Z"
+    },
+    {
+      "productName": "laptoop",
+      "category": "Electronics",
+      "price": 234567,
+      "stockQuantity": 1234,
+      "description": "dvjdhskghjghkd",
+      "userName": "user1",
+      "status": "Booked",
+      "id": "4189nm2",
+      "createdAt": "2025-04-04T07:03:06.383Z"
+    },
+    {
+      "productName": "dds",
+      "category": "Clothing",
+      "price": 12,
+      "stockQuantity": 2,
+      "description": "2sdfadf",
+      "userName": "user1",
+      "status": "Booked",
+      "id": "gswo3kr",
+      "createdAt": "2025-04-04T07:24:27.644Z"
+    }
+  ],
+  "services": [
+    {
+      "id": "mf4upxa",
+      "name": "w",
+      "description": "w",
+      "imageUrl": "w",
+      "createdAt": "2025-04-03T11:13:30.546Z"
+    }
+  ]
+}
